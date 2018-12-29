@@ -45,6 +45,17 @@ func getContentType(file *os.File) (string, error) {
 	return contentType, nil
 }
 
+func objExists(svc *s3.S3, obj *s3.HeadObjectInput) bool {
+	req := svc.HeadObjectRequest(obj)
+
+	_, err := req.Send()
+	if err != nil {
+		return false
+	}
+
+	return true
+}
+
 func main() {
 	args := os.Args
 
@@ -57,6 +68,7 @@ func main() {
 	length := flag.Int("l", 6, "generated url length")
 	bucket := flag.String("b", "", "S3 bucket to upload the file")
 	region := flag.String("r", "", "AWS region")
+	force := flag.Bool("f", false, "force override existing file")
 	flag.Parse()
 	args = flag.Args()
 
@@ -109,10 +121,23 @@ func main() {
 	if err != nil {
 		panic("Unable to load SDK config, " + err.Error())
 	}
-
 	cfg.Region = *region
-
 	svc := s3.New(cfg)
+
+	// Ensure there isn't already a file with the same key
+	if !*force {
+		obj := s3.HeadObjectInput{
+			Key:    key,
+			Bucket: bucket,
+		}
+		exists := objExists(svc, &obj)
+		if exists {
+			fmt.Printf("File already exists with the same key: %s\n", *key)
+			os.Exit(0)
+		}
+	}
+
+	// Upload the file
 	obj := s3.PutObjectInput{
 		Key:         key,
 		Bucket:      bucket,
@@ -120,7 +145,6 @@ func main() {
 		ContentType: &contentType,
 	}
 	req := svc.PutObjectRequest(&obj)
-
 	_, err = req.Send()
 	if err != nil {
 		fmt.Printf("Failed to upload your file: %s", err.Error())
