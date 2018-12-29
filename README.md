@@ -43,10 +43,10 @@ shoots3 [flags] filename
 ```
 
 ### Flags
-| Flag | Default                  | Usage                                          |
-| ---- | ------------------------ | ---------------------------------------------- |
-| `-k` | random string            | Custom key to store the image                  |
-| `-l` | 6                        | Length of the randomly generated url           |
-| `-b` | `SHOOTS3_DEFAULT_BUCKET` | Bucket to upload the image to                  |
-| `-r` | `AWS_REGION`             | Region where the bucket is located             |
-| `-f` | `false`                  | Force override existing file with the same key |
+| Flag | Name           | Default                  | Usage                                          |
+| ---- | -------------- | ------------------------ | ---------------------------------------------- |
+| `-k` | Key            | random string            | Custom key to store the image                  |
+| `-l` | Key Length     | 6                        | Length of the randomly generated url           |
+| `-b` | Bucket         | `SHOOTS3_DEFAULT_BUCKET` | Bucket to upload the image to                  |
+| `-r` | Region         | `AWS_REGION`             | Region where the bucket is located             |
+| `-f` | Force Override | `false`                  | Force override existing file with the same key |
