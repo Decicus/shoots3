@@ -121,10 +121,12 @@ func main() {
 	}
 	req := svc.PutObjectRequest(&obj)
 
-	res, err := req.Send()
+	_, err = req.Send()
 	if err != nil {
-		panic(err.Error())
+		fmt.Printf("Failed to upload your file: %s", err.Error())
+		os.Exit(1)
 	}
 
-	fmt.Printf("RES: %s\n", res.String())
+	// URL of the uploaded file
+	fmt.Printf("https://s3-%s.amazonaws.com/%s/%s\n", *region, *bucket, *key)
 }
