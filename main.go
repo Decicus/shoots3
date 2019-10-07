@@ -10,6 +10,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws/external"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-sdk-go-v2/aws/endpoints"
 )
 
 // printUsage prints the usage for shoots3.
@@ -69,6 +70,7 @@ func main() {
 	bucket := flag.String("b", "", "S3 bucket to upload the file")
 	region := flag.String("r", "", "AWS region")
 	force := flag.Bool("f", false, "force override existing file")
+	endpoint := flag.String("e", "", "Use a custom S3 endpoint (such as a MinIO deployment)")
 	flag.Parse()
 	args = flag.Args()
 
@@ -122,6 +124,19 @@ func main() {
 		panic("Unable to load SDK config, " + err.Error())
 	}
 	cfg.Region = *region
+
+	// Add custom resolver for a custom S3 endpoint
+	// https://docs.aws.amazon.com/sdk-for-go/v2/api/aws/endpoints/#hdr-Using_Custom_Endpoints
+	if *endpoint != "" {
+		endpointResolver := func(service, region string) (aws.Endpoint, error) {
+			return aws.Endpoint{
+				URL: endpoint,
+			}, nil
+		}
+
+		cfg.EndpointResolver = aws.EndpointResolverFunc(endpointResolver)
+	}
+
 	svc := s3.New(cfg)
 
 	// Ensure there isn't already a file with the same key
@@ -152,5 +167,6 @@ func main() {
 	}
 
 	// URL of the uploaded file
+	// TODO: Need to figure out how to deal with URLs on custom endpoints.
 	fmt.Printf("https://s3-%s.amazonaws.com/%s/%s\n", *region, *bucket, *key)
 }
