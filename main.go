@@ -8,9 +8,9 @@ import (
 	"os"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/external"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/aws/aws-sdk-go-v2/aws/endpoints"
 )
 
 // printUsage prints the usage for shoots3.
@@ -130,7 +130,7 @@ func main() {
 	if *endpoint != "" {
 		endpointResolver := func(service, region string) (aws.Endpoint, error) {
 			return aws.Endpoint{
-				URL: endpoint,
+				URL: *endpoint,
 			}, nil
 		}
 
